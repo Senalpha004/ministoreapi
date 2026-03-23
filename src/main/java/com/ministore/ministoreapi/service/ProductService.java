@@ -14,14 +14,14 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ProductService {
     //this class is called by the controller and handles the main logic of the program
     //this the logic operator which stores and handles product IDs, rules and errors.
-
+/*
     //data storage in memory later to be replaced with DB
-    //private final Map<Long, Product> store = new LinkedHashMap<>();
-   // private final AtomicLong idGen = new AtomicLong(0); //generates the ID automatically
+    private final Map<Long, Product> store = new LinkedHashMap<>();
+    private final AtomicLong idGen = new AtomicLong(0); //generates the ID automatically
 
 
     //method to create a product request easily for seed()
-    /*private ProductRequest req(String name, BigDecimal price, int stock){
+    private ProductRequest req(String name, BigDecimal price, int stock){
         ProductRequest pr =  new ProductRequest();
         pr.setName(name);
         pr.setPrice(price);
@@ -98,12 +98,54 @@ public class ProductService {
         return repository.findAll();
     }
 
-    public Product getProductById(Long id) {
+    public Product getById(Long id) {
         return repository.findById(id).orElseThrow(
                 () -> new NotFoundException("Product not found with id: " + id)
         );
     }
 
+    public Product create(ProductRequest req){
+        Product p =  new Product();
+        p.setName(req.getName());
+        p.setPrice(req.getPrice());
+        p.setStock(req.getStock());
 
+        return repository.save(p);
+    }
+
+    public Product update(Long id, ProductRequest req) {
+
+        Product existing = getById(id); //ensures it exists
+        existing.setName(req.getName());
+        existing.setPrice(req.getPrice());
+        existing.setStock(req.getStock());
+        return repository.save(existing);
+    }
+
+    public void delete(Long id) {
+        Product existing = getById(id);
+        repository.delete(existing);
+    }
+
+    public Product updateStock(Long id, Integer delta) {
+        Product existing = getById(id);
+
+        int newStock = existing.getStock() + delta;
+
+        if (newStock < 0) {
+            throw new IllegalArgumentException("Stock is out of range!");
+        }
+        existing.setStock(newStock);
+        return repository.save(existing);
+    }
+
+    public List<Product> search(String q, BigDecimal minPrice, BigDecimal maxPrice){
+        return repository.findAll().stream()
+                .filter(p -> q == null || p.getName().toLowerCase().contains(q.toLowerCase()))
+                .filter(p -> minPrice == null || p.getPrice().compareTo(minPrice) >= 0)
+                .filter(p -> maxPrice == null || p.getPrice().compareTo(maxPrice) <= 0)
+                .toList()
+                ;
+    }
 
 }
