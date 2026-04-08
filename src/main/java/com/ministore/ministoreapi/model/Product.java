@@ -2,10 +2,7 @@ package com.ministore.ministoreapi.model;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 
 @Entity //makes the class a database table
 public class Product {
@@ -19,17 +16,20 @@ public class Product {
     private String name;
     private BigDecimal price;
     private Integer stock;
+    @ManyToOne
+    private Category category;
 
     public Product() {
 
     }
 
     //constructor to be used by the creating objects and assigning the input values
-    public Product(long id, String name, BigDecimal price, Integer stock) {
+    public Product(long id, String name, BigDecimal price, Integer stock, Category category) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stock = stock;
+        this.category = category;
 
     }
 
@@ -66,4 +66,13 @@ public class Product {
     public void setStock(Integer stock) {
         this.stock = stock;
     }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
 }

@@ -20,6 +20,10 @@ public class ProductRequest {
     @Min(value = 0, message = "Stock cannot be Negative!")
     private Integer stock;
 
+    //connecting the category
+    @NotNull(message = "Category is required * ")
+    private Long categoryId;
+
     //getters and setters
 
     public String getName() {
@@ -44,5 +48,13 @@ public class ProductRequest {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 }

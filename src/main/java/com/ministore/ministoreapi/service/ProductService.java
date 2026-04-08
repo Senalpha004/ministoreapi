@@ -1,8 +1,10 @@
 package com.ministore.ministoreapi.service;
 
+import com.ministore.ministoreapi.model.Category;
 import com.ministore.ministoreapi.model.Product;
 import com.ministore.ministoreapi.dto.ProductRequest;
 import com.ministore.ministoreapi.exception.NotFoundException;
+import com.ministore.ministoreapi.repository.CategoryRepository;
 import com.ministore.ministoreapi.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ProductService {
     //this class is called by the controller and handles the main logic of the program
     //this the logic operator which stores and handles product IDs, rules and errors.
+    //aka brain.
 /*
     //data storage in memory later to be replaced with DB
     private final Map<Long, Product> store = new LinkedHashMap<>();
@@ -90,8 +93,11 @@ public class ProductService {
     //after creating a product repo
 
     private final ProductRepository repository;
-    public ProductService(ProductRepository repository) {
+    private final CategoryRepository cr;
+    public ProductService(ProductRepository repository, CategoryRepository catRepo) {
+
         this.repository = repository;
+        this.cr = catRepo;
     }
 
     public List<Product> getAll() {
@@ -105,20 +111,31 @@ public class ProductService {
     }
 
     public Product create(ProductRequest req){
+
+        Category category = cr.findById(req.getCategoryId())
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+
         Product p =  new Product();
         p.setName(req.getName());
         p.setPrice(req.getPrice());
         p.setStock(req.getStock());
+        p.setCategory(category);
 
         return repository.save(p);
     }
 
     public Product update(Long id, ProductRequest req) {
 
+        Category category = cr.findById(req.getCategoryId())
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+
+
         Product existing = getById(id); //ensures it exists
         existing.setName(req.getName());
         existing.setPrice(req.getPrice());
         existing.setStock(req.getStock());
+        existing.setCategory(category);
+
         return repository.save(existing);
     }
 
